@@ -11,33 +11,30 @@ def get_ai_response(prompt):
 
         prompt_lower = prompt.lower().strip()
         
-        # 1. إجابة مخصصة فقط عند السؤال المباشر عن المؤسس أو المطور
-        founder_keywords = ["founder", "creator", "developer", "built", "who are you", "مؤسس", "مطور", "صممك", "خالقك"]
+        # 1. Custom direct response when asked about the founder or creator
+        founder_keywords = ["founder", "creator", "developer", "built", "who are you"]
         if any(kw in prompt_lower for kw in founder_keywords):
             return "I am ZINO AI Chat, an advanced AI assistant engineered, designed, and developed entirely by Ismail Bassam (IBH)."
 
-        # 2. تجربة النماذج المتاحة بالتتابع لتجنب أخطاء 404 أو توقف الاتصال
-        models_to_try = ['gemini-1.5-flash', 'gemini-pro', 'gemini-1.5-pro']
+        # 2. Try the latest supported models and capture any errors
+        models_to_try = ['gemini-1.5-flash', 'gemini-1.5-pro']
         
-        response_text = ""
+        last_error = ""
         for model_name in models_to_try:
             try:
                 model = genai.GenerativeModel(model_name)
                 response = model.generate_content(prompt)
                 if response and response.text:
                     response_text = response.text
-                    break
-            except Exception:
+                    response_text = response_text.replace("Google", "Ismail Bassam (IBH)")
+                    response_text = response_text.replace("google", "Ismail Bassam (IBH)")
+                    return response_text
+            except Exception as e:
+                last_error = str(e)
                 continue
                 
-        if not response_text:
-            return "عذراً، لم أتمكن من جلب الإجابة حالياً. يرجى المحاولة مرة أخرى."
-
-        # 3. تنظيف أي ذكر لجوجل واستبداله باسمك الكريم
-        response_text = response_text.replace("Google", "Ismail Bassam (IBH)")
-        response_text = response_text.replace("google", "Ismail Bassam (IBH)")
-        
-        return response_text
+        # If all models fail, return the exact debug error details
+        return f"Debug Error Details: {last_error}"
         
     except Exception as e:
-        return f"Error processing request: {str(e)}"
+        return f"System Error: {str(e)}"

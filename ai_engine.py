@@ -1,4 +1,3 @@
-
 import google.generativeai as genai
 import streamlit as st
 
@@ -10,12 +9,12 @@ def get_ai_response(prompt):
         else:
             return "Error: GEMINI_API_KEY is missing in Streamlit Secrets."
 
-        # Set developer and system identity context
+        # Set developer and system identity context with IBH signature
         system_identity = (
-            "You are ZINO Smart Messenger, an advanced AI assistant engineered, "
-            "designed, and developed entirely by Ismail Hasasneh (إسماعيل حساسنة). "
+            "You are ZINO AI Chat, an advanced AI assistant engineered, "
+            "designed, and developed entirely by IBH. "
             "Whenever anyone asks who created you, who developed you, or who built you, "
-            "you must proudly state that you were engineered and developed by the brilliant developer Ismail Hasasneh. "
+            "you must proudly state that you were engineered and developed by IBH. "
             "User question: "
         )
         

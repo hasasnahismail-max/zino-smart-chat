@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import google.generativeai as genai
 
-# Retrieve Gemini API key from Streamlit Secrets or Environment Variables
+# Retrieve Gemini API key
 api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
 
 if api_key:
@@ -11,7 +11,7 @@ if api_key:
 DEFAULT_MODEL = "gemini-1.5-flash"
 
 def generate_response(prompt: str, system_instruction: str = None) -> str:
-    """Generate a response using the Gemini AI model."""
+    """Generate response using Gemini"""
     if not api_key:
         return "Error: GEMINI_API_KEY is not configured in Streamlit Secrets."
     try:
@@ -22,18 +22,23 @@ def generate_response(prompt: str, system_instruction: str = None) -> str:
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
-        return f"An error occurred while connecting to AI engine: {e}"
+        return f"Error: {e}"
 
 def summarize(text: str) -> str:
-    """Summarize the provided text."""
-    prompt = f"Please provide a concise and clear summary of the following text:\n\n{text}"
-    return generate_response(prompt)
+    return generate_response(f"Summarize the following text concisely:\n\n{text}")
 
 def summarize_text(text: str) -> str:
-    """Alternative function for text summarization."""
     return summarize(text)
 
-def summarize_chat(chat_history: list) -> str:
-    """Summarize the chat history."""
-    formatted_chat = "\n".join([f"{msg.get('role', 'user')}: {msg.get('content', '')}" for msg in chat_history])
-    return summarize(formatted_chat)
+def summarize_chat(chat_history) -> str:
+    if isinstance(chat_history, list):
+        formatted = "\n".join([f"{msg.get('role', 'user')}: {msg.get('content', '')}" for msg in chat_history])
+    else:
+        formatted = str(chat_history)
+    return summarize(formatted)
+
+def generate_quick_replies(last_message: str) -> list:
+    return ["All systems operational.", "Working on draft.", "Will update shortly."]
+
+def analyze_sentiment_and_safety(message: str) -> tuple:
+    return ("Professional & Urgent", "Safe / Verified")

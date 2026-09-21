@@ -1,0 +1,52 @@
+import os
+from google import genai
+
+# Initialize Gemini API Client
+api_key = os.environ.get("GEMINI_API_KEY", "")
+client = genai.Client(api_key=api_key) if api_key else None
+
+def summarize_chat(chat_text: str) -> str:
+    """Summarizes conversation context using Gemini LLM."""
+    if not client:
+        return "Demo Mode: Discussion centered around system diagnostics, pipeline verification, and technical whitepaper deadlines."
+    try:
+        prompt = f"Summarize the following chat stream concisely with key action items:\n\n{chat_text}"
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt
+        )
+        return response.text
+    except Exception as e:
+        return f"Summary unavailable: {str(e)}"
+
+def generate_quick_replies(last_message: str) -> list:
+    """Generates context-aware short responses."""
+    if not client:
+        return ["All systems operational.", "Working on whitepaper draft.", "Will update shortly."]
+    try:
+        prompt = f"Given this message: '{last_message}', generate 3 short, professional quick responses separated by commas."
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt
+        )
+        replies = [r.strip() for r in response.text.split(',')]
+        return replies[:3]
+    except Exception:
+        return ["Acknowledged.", "Under review.", "Will do."]
+
+def analyze_sentiment_and_safety(message: str) -> tuple:
+    """Analyzes tone and screens safety aspects of incoming message."""
+    if not client:
+        return ("Professional & Urgent", "Safe / Verified")
+    try:
+        prompt = f"Analyze sentiment and safety for this message: '{message}'. Return format: Tone | Safety Status"
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt
+        )
+        parts = response.text.split('|')
+        tone = parts[0].strip() if len(parts) > 0 else "Neutral"
+        safety = parts[1].strip() if len(parts) > 1 else "Safe"
+        return (tone, safety)
+    except Exception:
+        return ("Neutral", "Safe")

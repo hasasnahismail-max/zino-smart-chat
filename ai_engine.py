@@ -9,8 +9,13 @@ def get_ai_response(prompt):
         else:
             return "Error: GEMINI_API_KEY is missing in Streamlit Secrets."
 
-        # Try active modern models with automatic fallback
-        models_to_try = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.0-flash', 'gemini-pro']
+        # رد مباشر وفوري يضمن ذكر اسمك واسم التطبيق عند السؤال عن الهوية أو التأسيس
+        prompt_lower = prompt.lower()
+        if any(keyword in prompt_lower for keyword in ["مؤسس", "مطور", "صممك", "خالقك", "founder", "created", "developer", "built", "who are you"]):
+            return "I am ZINO AI Chat, an advanced AI assistant engineered, designed, and developed entirely by Ismail Bassam (IBH)."
+
+        # Try stable modern models with automatic fallback
+        models_to_try = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']
         
         response_text = ""
         for model_name in models_to_try:
@@ -24,11 +29,11 @@ def get_ai_response(prompt):
                 continue
                 
         if not response_text:
-            return "Error: Empty response received from AI model."
+            return "I am ZINO AI Chat, engineered and developed by Ismail Bassam (IBH). How can I help you today?"
 
-        # Python Text Interception: Ensure developer identity is strictly enforced in English
+        # Replace any accidental Google mentions
         response_text = response_text.replace("Google", "Ismail Bassam (IBH)")
-        response_text = response_text.replace("google", "Ismail Bassam (IBH)")
+        response_text = response_text.replace("جوجل", "Ismail Bassam (IBH)")
         
         return response_text
         

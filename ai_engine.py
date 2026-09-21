@@ -9,25 +9,35 @@ def get_ai_response(prompt):
         else:
             return "Error: GEMINI_API_KEY is missing in Streamlit Secrets."
 
-        prompt_lower = prompt.lower()
+        prompt_lower = prompt.lower().strip()
         
-        # Direct custom response when asked about the founder or creator
-        if any(keyword in prompt_lower for keyword in ["founder", "creator", "developer", "built", "who are you", "مؤسس", "مطور", "صممك", "خالقك"]):
+        # 1. إجابة مخصصة فقط عند السؤال المباشر عن المؤسس أو المطور
+        founder_keywords = ["founder", "creator", "developer", "built", "who are you", "مؤسس", "مطور", "صممك", "خالقك"]
+        if any(kw in prompt_lower for kw in founder_keywords):
             return "I am ZINO AI Chat, an advanced AI assistant engineered, designed, and developed entirely by Ismail Bassam (IBH)."
 
-        # Use the universally supported and stable gemini-pro model
-        model = genai.GenerativeModel('gemini-pro')
-        response = model.generate_content(prompt)
+        # 2. تجربة النماذج المتاحة بالتتابع لتجنب أخطاء 404 أو توقف الاتصال
+        models_to_try = ['gemini-1.5-flash', 'gemini-pro', 'gemini-1.5-pro']
         
-        if response and response.text:
-            response_text = response.text
-            # Replace any Google mentions with your name/brand
-            response_text = response_text.replace("Google", "Ismail Bassam (IBH)")
-            response_text = response_text.replace("google", "Ismail Bassam (IBH)")
-            return response_text
-        else:
-            return "I am ZINO AI Chat, engineered and developed by Ismail Bassam (IBH). How can I help you today?"
-            
+        response_text = ""
+        for model_name in models_to_try:
+            try:
+                model = genai.GenerativeModel(model_name)
+                response = model.generate_content(prompt)
+                if response and response.text:
+                    response_text = response.text
+                    break
+            except Exception:
+                continue
+                
+        if not response_text:
+            return "عذراً، لم أتمكن من جلب الإجابة حالياً. يرجى المحاولة مرة أخرى."
+
+        # 3. تنظيف أي ذكر لجوجل واستبداله باسمك الكريم
+        response_text = response_text.replace("Google", "Ismail Bassam (IBH)")
+        response_text = response_text.replace("google", "Ismail Bassam (IBH)")
+        
+        return response_text
+        
     except Exception as e:
-        # Graceful fallback response in case of any API exception
-        return "I am ZINO AI Chat, an advanced AI assistant developed by Ismail Bassam (IBH). How can I assist you today?"
+        return f"Error processing request: {str(e)}"

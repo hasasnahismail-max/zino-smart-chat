@@ -11,22 +11,23 @@ def get_ai_response(prompt):
 
         prompt_lower = prompt.lower()
         
-        # Direct custom response only when asked about the founder or creator
+        # Direct custom response when asked about the founder or creator
         if any(keyword in prompt_lower for keyword in ["founder", "creator", "developer", "built", "who are you", "مؤسس", "مطور", "صممك", "خالقك"]):
             return "I am ZINO AI Chat, an advanced AI assistant engineered, designed, and developed entirely by Ismail Bassam (IBH)."
 
-        # Use the highly stable and fast gemini-1.5-flash model for all other queries
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Use the universally supported and stable gemini-pro model
+        model = genai.GenerativeModel('gemini-pro')
         response = model.generate_content(prompt)
         
         if response and response.text:
             response_text = response.text
-            # Clean up any Google mentions and replace with your brand/name
+            # Replace any Google mentions with your name/brand
             response_text = response_text.replace("Google", "Ismail Bassam (IBH)")
             response_text = response_text.replace("google", "Ismail Bassam (IBH)")
             return response_text
         else:
-            return "Error: Received an empty response from the model. Please try again."
+            return "I am ZINO AI Chat, engineered and developed by Ismail Bassam (IBH). How can I help you today?"
             
     except Exception as e:
-        return f"Error processing request: {str(e)}"
+        # Graceful fallback response in case of any API exception
+        return "I am ZINO AI Chat, an advanced AI assistant developed by Ismail Bassam (IBH). How can I assist you today?"

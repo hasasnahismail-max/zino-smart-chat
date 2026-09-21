@@ -1,60 +1,39 @@
 import streamlit as st
-from ai_engine import get_ai_response
 
-# 1. Page Configuration
+# Page configuration with logo icon
 st.set_page_config(
     page_title="ZINO AI Chat",
-    page_icon="🤖",
+    page_icon="1790031715637.png",
     layout="centered"
 )
 
-# 2. Styling (Beige & Turquoise Theme + Custom Banner)
-st.markdown("""
-    <style>
-    .stApp {
-        background-color: #FDFBF7;
-    }
-    .main-header {
-        text-align: center;
-        color: #008080;
-        font-family: 'Helvetica Neue', sans-serif;
-        font-weight: bold;
-    }
-    .ibh-banner {
-        background-color: #E6F2F2;
-        padding: 12px;
-        border-radius: 8px;
-        text-align: center;
-        color: #006666;
-        font-weight: 600;
-        margin-bottom: 25px;
-        border: 1px solid #B2D8D8;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# Display logo and title
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image("1790031715637.png", width=140)
 
-# 3. Header & Branding
-st.markdown("<h1 class='main-header'>ZINO AI Chat</h1>", unsafe_allow_html=True)
-st.markdown("<div class='ibh-banner'>✨ Engineered & Developed by Ismail Bassam (IBH) ✨</div>", unsafe_allow_html=True)
+st.title("ZINO AI")
+st.caption("AI Assistant for Intelligent Systems")
 
-# 4. Initialize Session History
+# Chat history management
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [
+        {"role": "assistant", "content": "Welcome to ZINO AI! How can I assist you today?"}
+    ]
 
-# 5. Display Previous Messages
+# Display chat history
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+        st.write(message["content"])
 
-# 6. User Prompt Logic
-if prompt := st.chat_input("Type your message here... ✍️✨"):
+# Handle user input and assistant response
+if prompt := st.chat_input("Type your message here..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
-        st.markdown(prompt)
+        st.write(prompt)
 
-    with st.chat_message("assistant"):
-        with st.spinner("Processing response..."):
-            response = get_ai_response(prompt)
-            st.markdown(response)
-
+    response = f"Received your message: '{prompt}'. Model integration in progress."
+    
     st.session_state.messages.append({"role": "assistant", "content": response})
+    with st.chat_message("assistant"):
+        st.write(response)

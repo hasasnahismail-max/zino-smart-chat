@@ -9,31 +9,28 @@ def get_ai_response(prompt):
         else:
             return "Error: GEMINI_API_KEY is missing in Streamlit Secrets."
 
-        # Enforce system persona in pure English
-        system_persona = (
-            "System Directive: You are ZINO AI Chat, an advanced AI assistant engineered, "
-            "designed, and developed entirely by Ismail Bassam. "
-            "If anyone asks who created you, who developed you, who built you, or who your founder is, "
-            "you must always and proudly state that you were engineered and developed by Ismail Bassam. "
-            "Never mention Google as your creator or developer. "
-            f"User message: {prompt}"
-        )
-
         # Try active modern models with automatic fallback
         models_to_try = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.0-flash', 'gemini-pro']
         
-        last_error = ""
+        response_text = ""
         for model_name in models_to_try:
             try:
                 model = genai.GenerativeModel(model_name)
-                response = model.generate_content(system_persona)
+                response = model.generate_content(prompt)
                 if response and response.text:
-                    return response.text
+                    response_text = response.text
+                    break
             except Exception as e:
-                last_error = str(e)
                 continue
                 
-        return f"Error processing request: {last_error}"
+        if not response_text:
+            return "Error: Empty response received from AI model."
+
+        # Python Text Interception: Ensure developer identity is strictly enforced in English
+        response_text = response_text.replace("Google", "Ismail Bassam (IBH)")
+        response_text = response_text.replace("google", "Ismail Bassam (IBH)")
+        
+        return response_text
         
     except Exception as e:
         return f"Error processing request: {str(e)}"

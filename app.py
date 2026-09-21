@@ -1,6 +1,14 @@
 import streamlit as st
 
-# Page configuration with logo icon
+# Force the Hoopoe mascot icon on browser and PWA
+st.markdown(
+    """
+    <link rel="icon" href="1790031715637.png">
+    """,
+    unsafe_allow_html=True
+)
+
+# Page configuration
 st.set_page_config(
     page_title="ZINO AI Chat",
     page_icon="1790031715637.png",
@@ -21,12 +29,12 @@ if "messages" not in st.session_state:
         {"role": "assistant", "content": "Welcome to ZINO AI! How can I assist you today?"}
     ]
 
-# Display chat history
+# Display previous messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-# Handle user input and assistant response
+# User input and assistant response
 if prompt := st.chat_input("Type your message here..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):

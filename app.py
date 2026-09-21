@@ -1,69 +1,62 @@
 import streamlit as st
 from ai_engine import get_ai_response
 
+# Page Configuration
 st.set_page_config(
     page_title="ZINO AI Chat",
-    page_icon="🤖✨",
+    page_icon="🤖",
     layout="centered"
 )
 
+# Custom CSS for Beige and Turquoise Theme & IBH Signature Banner
 st.markdown("""
     <style>
     .stApp {
-        background-color: #F7F4EB;
-        color: #004D4D;
+        background-color: #FDFBF7;
     }
-    
-    h1, h2, h3 {
-        color: #008B8B !important;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    .main-header {
+        text-align: center;
+        color: #008080;
+        font-family: 'Helvetica Neue', sans-serif;
+        font-weight: bold;
     }
-    
-    .stChatMessage {
-        border-radius: 18px;
-        padding: 14px;
-        margin-bottom: 12px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    }
-    
-    [data-testid="stChatMessageUser"] {
-        background-color: #E6DFD1;
-        border: 1px solid #D1C7B7;
-    }
-    
-    [data-testid="stChatMessageAssistant"] {
-        background-color: #FFFFFF;
-        border: 1px solid #A3D9D9;
+    .ibh-banner {
+        background-color: #E6F2F2;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+        color: #006666;
+        font-weight: 600;
+        margin-bottom: 20px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🌟 ZINO AI Chat 🚀")
-st.markdown("### *Your Intelligent & Creative AI Companion* 💡🎨")
+# Header & IBH Signature Banner
+st.markdown("<h1 class='main-header'>ZINO AI Chat</h1>", unsafe_allow_html=True)
+st.markdown("<div class='ibh-banner'>✨ Engineered & Developed by Ismail Bassam (IBH) ✨</div>", unsafe_allow_html=True)
 
-st.markdown("""
-    <div style="background-color: #E6DFD1; padding: 12px; border-radius: 12px; text-align: center; border: 2px solid #008B8B; margin: 15px 0;">
-        <span style="color: #008B8B; font-weight: bold; font-size: 16px;">✨ Engineered & Founded by IBH ✨</span>
-    </div>
-""", unsafe_allow_html=True)
-
-st.markdown("---")
-
+# Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+# Display chat messages from history on app rerun
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if user_input := st.chat_input("Type your message here... ✍️✨"):
-    st.session_state.messages.append({"role": "user", "content": user_input})
+# Accept user input
+if prompt := st.chat_input("Type your message here... ✍️✨"):
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
-        st.markdown(user_input)
+        st.markdown(prompt)
 
+    # Generate AI response
     with st.chat_message("assistant"):
-        with st.spinner("✨ ZINO is thinking creatively..."):
-            ai_response = get_ai_response(user_input)
-            st.markdown(ai_response)
-            
-    st.session_state.messages.append({"role": "assistant", "content": ai_response})
+        with st.spinner("Thinking..."):
+            response = get_ai_response(prompt)
+            st.markdown(response)
+    
+    # Add assistant response to chat history
+    st.session_state.messages.append({"role": "assistant", "content": response})

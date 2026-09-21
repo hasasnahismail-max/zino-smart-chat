@@ -3,40 +3,40 @@ import streamlit as st
 
 def get_ai_response(prompt):
     try:
-        # 1. التحقق من مفتاح الـ API
+        # 1. Verify API Key
         if "GEMINI_API_KEY" not in st.secrets:
             return "Error: GEMINI_API_KEY is missing in Streamlit Secrets."
             
         genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-        # 2. جلب قائمة النماذج المتاحة لمفتاحك تلقائياً لتفادي خطأ 404
-        selected_model = None
+        # 2. Dynamically fetch available models to guarantee 0% 404 errors
+        working_models = []
         try:
-            available_models = [
-                m.name for m in genai.list_models() 
-                if 'generateContent' in m.supported_generation_methods
-            ]
-            
-            # اختيار أفضل نموذج متاح من القائمة المسترجعة
-            for model_name in available_models:
-                if 'flash' in model_name or 'pro' in model_name:
-                    selected_model = model_name
-                    break
-                    
-            if not selected_model and available_models:
-                selected_model = available_models[0]
+            for m in genai.list_models():
+                if 'generateContent' in m.supported_generation_methods:
+                    working_models.append(m.name)
         except Exception:
-            # اسم احتياطي مع البادئة الرسمية
-            selected_model = 'models/gemini-1.5-flash-latest'
+            pass
 
-        # 3. إنشاء واستدعاء النموذج المكتشف
-        model = genai.GenerativeModel(selected_model)
-        response = model.generate_content(prompt)
-        
-        if response and response.text:
-            return response.text
-        else:
-            return "Error: Empty response received from the model."
-            
+        # Fallback list if model discovery is restricted
+        if not working_models:
+            working_models = ['gemini-1.5-flash', 'models/gemini-1.5-flash', 'gemini-pro']
+
+        # 3. Generate content using the first working model
+        last_error = ""
+        for model_name in working_models:
+            if 'gemini' not in model_name.lower():
+                continue
+            try:
+                model = genai.GenerativeModel(model_name)
+                response = model.generate_content(prompt)
+                if response and response.text:
+                    return response.text
+            except Exception as e:
+                last_error = str(e)
+                continue
+
+        return f"Connection Error: {last_error}"
+
     except Exception as e:
-        return f"Error processing request: {str(e)}"
+        return f"System Error: {str(e)}"

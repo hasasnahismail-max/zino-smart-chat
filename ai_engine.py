@@ -11,28 +11,22 @@ def get_ai_response(prompt):
 
         prompt_lower = prompt.lower()
         
-        # Custom direct response if the query is about the founder or creator
+        # Direct custom response only when asked about the founder or creator
         if any(keyword in prompt_lower for keyword in ["founder", "creator", "developer", "built", "who are you", "مؤسس", "مطور", "صممك", "خالقك"]):
             return "I am ZINO AI Chat, an advanced AI assistant engineered, designed, and developed entirely by Ismail Bassam (IBH)."
 
-        # Use the most stable text model
-        model = genai.GenerativeModel('gemini-pro')
+        # Use the highly stable and fast gemini-1.5-flash model for all other queries
+        model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(prompt)
         
         if response and response.text:
             response_text = response.text
-            # Clean up any Google mentions and replace with your name/IBH
+            # Clean up any Google mentions and replace with your brand/name
             response_text = response_text.replace("Google", "Ismail Bassam (IBH)")
             response_text = response_text.replace("google", "Ismail Bassam (IBH)")
             return response_text
         else:
-            # Intelligent fallback if response is empty
-            if "عاصمة" in prompt or "capital" in prompt_lower:
-                return "عاصمة الأردن هي عمّان. (ZINO AI Chat developed by Ismail Bassam)"
-            return "I am ZINO AI Chat, engineered and developed by Ismail Bassam (IBH). How can I help you?"
+            return "Error: Received an empty response from the model. Please try again."
             
     except Exception as e:
-        # Graceful error handling with a natural fallback response
-        if "عاصمة" in prompt or "capital" in prompt_lower:
-            return "عاصمة الأردن هي عمّان."
-        return f"Hello! I am ZINO AI Chat, developed by Ismail Bassam (IBH). How can I assist you today?"
+        return f"Error processing request: {str(e)}"

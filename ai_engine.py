@@ -9,8 +9,8 @@ def get_ai_response(prompt):
         else:
             return "Error: GEMINI_API_KEY is missing in Streamlit Secrets."
 
-        # Using gemini-1.5-flash for fast and accurate responses
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Using gemini-pro to completely avoid 404 errors on Streamlit cloud
+        model = genai.GenerativeModel('gemini-pro')
         response = model.generate_content(prompt)
         
         if response and response.text:

@@ -3,7 +3,7 @@ from ai_engine import get_ai_response
 
 # 1. Page Configuration
 st.set_page_config(
-    page_title="ZINO Smart Messenger",
+    page_title="ZINO AI Chat",
     page_icon="🤖✨",
     layout="centered"
 )
@@ -41,13 +41,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # App Header
-st.title("🌟 ZINO Smart Messenger 🚀")
+st.title("🌟 ZINO AI Chat 🚀")
 st.markdown("### *Your Intelligent & Creative AI Companion* 💡🎨")
 
-# Signature Banner / Your Fingerprint on the App
+# Signature Banner with IBH Symbol
 st.markdown("""
     <div style="background-color: #E6DFD1; padding: 12px; border-radius: 12px; text-align: center; border: 2px solid #008B8B; margin: 15px 0;">
-        <span style="color: #008B8B; font-weight: bold; font-size: 16px;">✨ Engineered & Founded by Ismail Hasasneh (إسماعيل حساسنة) ✨</span>
+        <span style="color: #008B8B; font-weight: bold; font-size: 16px;">✨ Engineered & Founded by IBH ✨</span>
     </div>
 """, unsafe_allow_html=True)
 

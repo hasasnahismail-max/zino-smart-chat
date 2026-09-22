@@ -1,38 +1,24 @@
 import streamlit as st
-import ai_engine
+from ai_engine import deconstruct_engineering_page
 
-st.set_page_config(
-    page_title="ZINO Feynman Engine",
-    page_icon="📐",
-    layout="wide"
+st.set_page_config(page_title="ZINO Feynman Engine", page_icon="🚀", layout="centered")
+
+st.title("🚀 ZINO Feynman Vision Engine")
+st.subheader("تفكيك الصفحات الهندسية المعقدة إلى رياضيات دقيقة وتشبيهات مبسطة")
+
+# Language Selector
+selected_language = st.selectbox(
+    "🌐 اختر لغة التحليل / Выберите язык анализа / Select Output Language:",
+    ["العربية", "Русский", "English"]
 )
 
-st.title("📐 ZINO Feynman Vision Engine")
-st.caption("Engineered by Ismail Hasasneh — STEM Textbook Page Deconstruction Platform")
+uploaded_file = st.file_uploader("ارفع صورة من كتاب هندسة أو رياضيات", type=["jpg", "jpeg", "png"])
 
-st.markdown("""
-> **How to use:** Capture or upload any page from an engineering, mathematics, or physics textbook. The engine will instantly break down the complex formulas into LaTeX math and simple Feynman-style analogies.
-""")
-
-# Input source selection
-input_mode = st.radio(
-    "Select Input Source:",
-    ["📸 Live Camera Capture", "📁 Upload Image File"],
-    horizontal=True
-)
-
-uploaded_page = None
-
-if input_mode == "📸 Live Camera Capture":
-    uploaded_page = st.camera_input("Point camera at textbook page and click capture")
-else:
-    uploaded_page = st.file_uploader("Upload page image:", type=["png", "jpg", "jpeg"])
-
-if uploaded_page:
-    st.image(uploaded_page, caption="Selected Page", width=400)
+if uploaded_file is not None:
+    st.image(uploaded_file, caption="Selected Page", use_column_width=True)
     
-    if st.button("Deconstruct & Simplify Page 🚀", use_container_width=True):
-        with st.spinner("Deconstructing mathematical formulas into Feynman analogies..."):
-            result = ai_engine.deconstruct_engineering_page(uploaded_page)
+    if st.button("Deconstruct & Simplify Page 🚀"):
+        with st.spinner("جاري تحليل الصفحة وتطبيق منهجية فاينمان..."):
+            result = deconstruct_engineering_page(uploaded_file, language=selected_language)
             st.success("Deconstruction Complete!")
             st.markdown(result)

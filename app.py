@@ -1,47 +1,38 @@
 import streamlit as st
+import ai_engine
 
-# Force the Hoopoe mascot icon on browser and PWA
-st.markdown(
-    """
-    <link rel="icon" href="1790031715637.png">
-    """,
-    unsafe_allow_html=True
-)
-
-# Page configuration
 st.set_page_config(
-    page_title="ZINO AI Chat",
-    page_icon="1790031715637.png",
-    layout="centered"
+    page_title="ZINO Feynman Engine",
+    page_icon="📐",
+    layout="wide"
 )
 
-# Display logo and title
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    st.image("1790031715637.png", width=140)
+st.title("📐 ZINO Feynman Vision Engine")
+st.caption("Engineered by Ismail Hasasneh — STEM Textbook Page Deconstruction Platform")
 
-st.title("ZINO AI")
-st.caption("AI Assistant for Intelligent Systems")
+st.markdown("""
+> **How to use:** Capture or upload any page from an engineering, mathematics, or physics textbook. The engine will instantly break down the complex formulas into LaTeX math and simple Feynman-style analogies.
+""")
 
-# Chat history management
-if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {"role": "assistant", "content": "Welcome to ZINO AI! How can I assist you today?"}
-    ]
+# Input source selection
+input_mode = st.radio(
+    "Select Input Source:",
+    ["📸 Live Camera Capture", "📁 Upload Image File"],
+    horizontal=True
+)
 
-# Display previous messages
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.write(message["content"])
+uploaded_page = None
 
-# User input and assistant response
-if prompt := st.chat_input("Type your message here..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.write(prompt)
+if input_mode == "📸 Live Camera Capture":
+    uploaded_page = st.camera_input("Point camera at textbook page and click capture")
+else:
+    uploaded_page = st.file_uploader("Upload page image:", type=["png", "jpg", "jpeg"])
 
-    response = f"Received your message: '{prompt}'. Model integration in progress."
+if uploaded_page:
+    st.image(uploaded_page, caption="Selected Page", width=400)
     
-    st.session_state.messages.append({"role": "assistant", "content": response})
-    with st.chat_message("assistant"):
-        st.write(response)
+    if st.button("Deconstruct & Simplify Page 🚀", use_container_width=True):
+        with st.spinner("Deconstructing mathematical formulas into Feynman analogies..."):
+            result = ai_engine.deconstruct_engineering_page(uploaded_page)
+            st.success("Deconstruction Complete!")
+            st.markdown(result)

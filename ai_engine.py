@@ -10,10 +10,9 @@ if API_KEY:
 def deconstruct_engineering_page(image_file, language: str = "العربية") -> str:
     """
     ZINO Vision Engine: Core deconstruction pipeline engineered by Ismail Hasasnah.
-    Supports Arabic, Russian, and English analytical outputs.
+    Includes smart fallback logic for API Rate Limits (429 errors).
     """
     try:
-        model = genai.GenerativeModel("gemini-3.6-flash")
         img = Image.open(image_file)
 
         lang_instructions = {
@@ -31,29 +30,37 @@ def deconstruct_engineering_page(image_file, language: str = "العربية") -
         Output Structure:
         ---
         ## 📐 1. Academic & Mathematical Rigor
-        * **Core Formula / Theorem:** State central formulas explicitly using LaTeX ($E = mc^2$ or $$\\int_{{a}}^{{b}} f(x) dx$$).
+        * **Core Formula / Theorem:** State central formulas explicitly using LaTeX ($E = mc^2$).
         * **Variable Definitions:** Clearly define symbols and their physical/mathematical units.
         * **Engineering Context:** Provide a step-by-step breakdown of real-world application.
 
         ---
         ## 💡 2. Feynman Intuitive Analogy (For a 10-Year-Old)
-        * **The Story / Analogy:** Explain using a clear, relatable everyday story that a child can visualize.
+        * **The Story / Analogy:** Explain using a clear, relatable everyday story.
         * **Golden Rule in One Sentence:** Single core takeaway sentence.
         ---
         """
 
         prompt = f"Analyze and deconstruct this engineering page in {language}."
 
-        max_retries = 3
-        for attempt in range(max_retries):
+        # المحاولة عبر عدة نماذج لتفادي أي ضغط على نموذج معين
+        models_to_try = ["gemini-3.6-flash", "gemini-1.5-flash", "gemini-2.5-flash"]
+
+        for model_name in models_to_try:
             try:
+                model = genai.GenerativeModel(model_name)
                 response = model.generate_content([system_instruction, img, prompt])
                 return response.text
-            except Exception as e:
-                if "429" in str(e) and attempt < max_retries - 1:
-                    time.sleep(10)
-                    continue
-                raise e
+            except Exception as model_err:
+                err_text = str(model_err)
+                if "429" in err_text or "Quota" in err_text:
+                    continue  # الانتقال للنموذج التالي تلقائياً
+                raise model_err
+
+        return "⏳ **Temporary API Limit:** Reached free tier speed limit. Please wait 60 seconds and try again."
 
     except Exception as e:
-        return f"⚠️ Exception occurred: {str(e)}"
+        err_msg = str(e)
+        if "429" in err_msg or "Quota" in err_msg:
+            return "⏳ **API Rate Limit Reached:** Please wait about 1 minute before clicking again."
+        return f"⚠️ Exception occurred: {err_msg}"

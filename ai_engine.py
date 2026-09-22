@@ -13,7 +13,8 @@ def deconstruct_engineering_page(image_file) -> str:
     rigorous LaTeX math and intuitive Feynman-style analogies.
     """
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        # Updated model identifier
+        model = genai.GenerativeModel("gemini-1.5-flash-latest")
         img = Image.open(image_file)
 
         system_instruction = """

@@ -2,14 +2,14 @@ import os
 import streamlit as st
 from PIL import Image
 
-# 1. Page Config
+# 1. Page Configuration
 st.set_page_config(
     page_title="ZINO Vision Engine | Ismail Hasasnah",
     page_icon="🪶",
     layout="centered"
 )
 
-# 2. Custom CSS Styles
+# 2. Custom CSS Styling
 st.markdown("""
 <style>
     .stApp {
@@ -85,7 +85,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Header & UI
+# 3. Header Section
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     if os.path.exists("logo.png"):
@@ -111,7 +111,7 @@ st.markdown("""
 
 st.caption("Deconstruct complex engineering pages, physics diagrams, and mathematics into clear formulas and intuitive analogies.")
 
-# 4. Inputs
+# 4. User Inputs
 selected_language = st.selectbox(
     "🌐 Select Target Output Language:",
     ["English", "Arabic", "Russian"]
@@ -119,7 +119,7 @@ selected_language = st.selectbox(
 
 uploaded_file = st.file_uploader("Upload Textbook Page or Mathematical Diagram:", type=["jpg", "jpeg", "png"])
 
-# 5. Internal AI Processing Function
+# 5. Core Processing Function
 def process_deconstruction(file_obj, lang):
     api_key = os.getenv("GEMINI_API_KEY", "")
     if not api_key:
@@ -149,23 +149,33 @@ def process_deconstruction(file_obj, lang):
         ---
         """
         
-        # النماذج الرسمية المعتمَدة حالياً في API
-        models = ["gemini-3.6-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
-        last_error = ""
+        # Dynamic discovery of active vision-capable models
+        models_to_try = []
+        try:
+            for model_info in genai.list_models():
+                if 'generateContent' in model_info.supported_generation_methods:
+                    models_to_try.append(model_info.name)
+        except Exception:
+            pass
 
-        for m in models:
+        # Fallback list if discovery fails
+        if not models_to_try:
+            models_to_try = ["gemini-1.5-flash", "gemini-1.5-pro"]
+
+        last_error = ""
+        for model_name in models_to_try:
             try:
-                model = genai.GenerativeModel(m)
-                res = model.generate_content([prompt, img])
-                if res and res.text:
-                    return res.text
-            except Exception as e:
-                last_error = str(e)
+                model = genai.GenerativeModel(model_name)
+                response = model.generate_content([prompt, img])
+                if response and response.text:
+                    return response.text
+            except Exception as ex:
+                last_error = str(ex)
                 continue
                 
-        return f"⚠️ Exception: {last_error}"
-    except Exception as e:
-        return f"⚠️ Processing Exception: {str(e)}"
+        return f"⚠️ API Exception: {last_error}"
+    except Exception as ex:
+        return f"⚠️ Processing Exception: {str(ex)}"
 
 # 6. Execution Trigger
 if uploaded_file is not None:
@@ -177,7 +187,7 @@ if uploaded_file is not None:
             st.success("Deconstruction Complete!")
             st.markdown(result)
 
-# 7. Footer
+# 7. Application Footer
 st.markdown("""
 <div class="custom-footer">
     <b>ZINO AI Systems</b> © 2026 — Developed & Maintained by <b>Ismail Hasasnah</b>

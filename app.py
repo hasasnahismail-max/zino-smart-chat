@@ -149,8 +149,8 @@ def process_deconstruction(file_obj, lang):
         ---
         """
         
-        # قائمة النماذج الفعالة
-        models = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.5-flash"]
+        # النماذج الرسمية المعتمَدة حالياً في API
+        models = ["gemini-3.6-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
         last_error = ""
 
         for m in models:

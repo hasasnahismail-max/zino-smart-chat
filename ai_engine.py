@@ -3,25 +3,29 @@ import time
 import google.generativeai as genai
 from PIL import Image
 
+# Initialize Gemini API Key
 API_KEY = os.getenv("GEMINI_API_KEY", "")
 if API_KEY:
     genai.configure(api_key=API_KEY)
 
-def deconstruct_engineering_page(image_file, language: str = "العربية") -> str:
+def deconstruct_engineering_page(image_file, language: str = "English") -> str:
     """
     ZINO Vision Engine: Core deconstruction pipeline engineered by Ismail Hasasnah.
-    Includes smart fallback logic for API Rate Limits (429 errors).
+    Supports English, Arabic, and Russian analytical outputs with fallback logic.
     """
+    if not API_KEY:
+        return "⚠️ API Key is missing. Please configure GEMINI_API_KEY in Streamlit Secrets."
+
     try:
         img = Image.open(image_file)
 
         lang_instructions = {
-            "العربية": "Write the response in fluent ARABIC. Keep all mathematical formulas strictly in LaTeX format.",
-            "Русский": "Write the response in fluent RUSSIAN. Keep all mathematical formulas strictly in LaTeX format.",
-            "English": "Write the response in precise ENGLISH. Keep all mathematical formulas strictly in LaTeX format."
+            "English": "Write the response in precise ENGLISH. Keep all mathematical formulas strictly in LaTeX format.",
+            "Arabic": "Write the response in fluent ARABIC. Keep all mathematical formulas strictly in LaTeX format.",
+            "Russian": "Write the response in fluent RUSSIAN. Keep all mathematical formulas strictly in LaTeX format."
         }
 
-        selected_instruction = lang_instructions.get(language, lang_instructions["العربية"])
+        selected_instruction = lang_instructions.get(language, lang_instructions["English"])
 
         system_instruction = f"""
         You are the ZINO Vision Engine (Feynman Methodology).
@@ -43,8 +47,8 @@ def deconstruct_engineering_page(image_file, language: str = "العربية") -
 
         prompt = f"Analyze and deconstruct this engineering page in {language}."
 
-        # المحاولة عبر عدة نماذج لتفادي أي ضغط على نموذج معين
-        models_to_try = ["gemini-3.6-flash", "gemini-1.5-flash", "gemini-2.5-flash"]
+        # Officially supported Gemini models for automated fallback
+        models_to_try = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
 
         for model_name in models_to_try:
             try:
@@ -53,11 +57,11 @@ def deconstruct_engineering_page(image_file, language: str = "العربية") -
                 return response.text
             except Exception as model_err:
                 err_text = str(model_err)
-                if "429" in err_text or "Quota" in err_text:
-                    continue  # الانتقال للنموذج التالي تلقائياً
+                if "429" in err_text or "Quota" in err_text or "not found" in err_text.lower():
+                    continue
                 raise model_err
 
-        return "⏳ **Temporary API Limit:** Reached free tier speed limit. Please wait 60 seconds and try again."
+        return "⏳ **Temporary API Limit:** Free tier limit reached. Please wait 60 seconds and try again."
 
     except Exception as e:
         err_msg = str(e)

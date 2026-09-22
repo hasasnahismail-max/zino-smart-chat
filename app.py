@@ -1,6 +1,5 @@
 import os
 import streamlit as st
-import ai_engine
 
 # 1. Page Configuration & Icon
 st.set_page_config(
@@ -9,10 +8,10 @@ st.set_page_config(
     layout="centered"
 )
 
-# 2. Custom CSS Styles matching Logo Aesthetics (Emerald & Gold Cyber Theme)
+# 2. Custom CSS Styles matching Cyber Emerald & Gold Theme
 st.markdown("""
 <style>
-    /* Global App Background & Text */
+    /* Global App Background & Typography */
     .stApp {
         background-color: #0b0f19;
         color: #e2e8f0;
@@ -36,7 +35,7 @@ st.markdown("""
         letter-spacing: -0.5px;
     }
     
-    /* Author Badge Styling */
+    /* Author Badge */
     .author-badge {
         color: #94a3b8;
         font-size: 0.95rem;
@@ -54,7 +53,7 @@ st.markdown("""
         color: #10b981;
     }
 
-    /* Feature Badges Grid */
+    /* Feature Badges */
     .badges-grid {
         display: flex;
         justify-content: center;
@@ -73,7 +72,7 @@ st.markdown("""
         font-weight: 500;
     }
 
-    /* Primary Launch Button with Emerald Glow */
+    /* Primary Launch Button */
     .stButton>button {
         width: 100%;
         background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
@@ -92,14 +91,14 @@ st.markdown("""
         box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
     }
 
-    /* Selectbox Input Styling */
+    /* Selectbox Input */
     div[data-testid="stSelectbox"] > div {
         background-color: #111827;
         border-radius: 10px;
         border: 1px solid #1f2937;
     }
 
-    /* Footer Styling */
+    /* Footer */
     .custom-footer {
         text-align: center;
         margin-top: 50px;
@@ -110,6 +109,13 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
+# Safe Engine Import
+try:
+    import ai_engine
+except Exception as import_err:
+    st.error(f"Error loading AI Engine module: {import_err}")
+    st.stop()
 
 # 3. Logo Display & Header
 col1, col2, col3 = st.columns([1, 2, 1])
@@ -131,7 +137,7 @@ st.markdown("""
 <div class="badges-grid">
     <span class="badge-item">📐 Rigorous LaTeX Mathematics</span>
     <span class="badge-item">💡 Interactive Feynman Logic</span>
-    <span class="badge-item">🌐 Multi-Language (AR / RU / EN)</span>
+    <span class="badge-item">🌐 Multi-Language (EN / AR / RU)</span>
     <span class="badge-item">🔬 Advanced STEM Deconstruction</span>
 </div>
 """, unsafe_allow_html=True)
@@ -140,15 +146,14 @@ st.caption("Deconstruct complex engineering pages, physics diagrams, and mathema
 
 # 5. Language Selection Dropdown
 selected_language = st.selectbox(
-    "🌐 Select Target Analysis Language:",
-    ["العربية", "Русский", "English"]
+    "🌐 Select Target Output Language:",
+    ["English", "Arabic", "Russian"]
 )
 
 # 6. File Uploader & Execution
 uploaded_file = st.file_uploader("Upload Textbook Page or Mathematical Diagram:", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    # استخدام قراءة القيمة وحاوية العرض الحديثة لمنع خطأ TypeError
     st.image(uploaded_file.getvalue(), caption="Target Page Preview", use_container_width=True)
     
     if st.button("Deconstruct & Analyze Page 🚀"):

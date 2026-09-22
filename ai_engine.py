@@ -13,9 +13,8 @@ def deconstruct_engineering_page(image_file) -> str:
     rigorous LaTeX math and intuitive Feynman-style analogies.
     """
     try:
-        # Use gemini-3.6-flash as required by API
+        # Model specification requested directly by API
         model = genai.GenerativeModel("gemini-3.6-flash")
-
         img = Image.open(image_file)
 
         system_instruction = """

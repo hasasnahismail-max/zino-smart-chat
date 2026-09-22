@@ -148,7 +148,8 @@ selected_language = st.selectbox(
 uploaded_file = st.file_uploader("Upload Textbook Page or Mathematical Diagram:", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    st.image(uploaded_file, caption="Target Page Preview", use_column_width=True)
+    # استخدام قراءة القيمة وحاوية العرض الحديثة لمنع خطأ TypeError
+    st.image(uploaded_file.getvalue(), caption="Target Page Preview", use_container_width=True)
     
     if st.button("Deconstruct & Analyze Page 🚀"):
         with st.spinner("Processing page layout and running Feynman vision engine..."):

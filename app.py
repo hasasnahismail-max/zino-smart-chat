@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+from PIL import Image
 
 # 1. Page Config
 st.set_page_config(
@@ -84,14 +85,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Safe Import
-try:
-    import ai_engine
-except Exception as err:
-    st.error(f"Failed to import ai_engine.py: {err}")
-    st.stop()
-
-# 4. Header & Logo
+# 3. Header & UI
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     if os.path.exists("logo.png"):
@@ -117,7 +111,7 @@ st.markdown("""
 
 st.caption("Deconstruct complex engineering pages, physics diagrams, and mathematics into clear formulas and intuitive analogies.")
 
-# 5. Inputs & Logic
+# 4. Inputs
 selected_language = st.selectbox(
     "🌐 Select Target Output Language:",
     ["English", "Arabic", "Russian"]
@@ -125,16 +119,65 @@ selected_language = st.selectbox(
 
 uploaded_file = st.file_uploader("Upload Textbook Page or Mathematical Diagram:", type=["jpg", "jpeg", "png"])
 
+# 5. Internal AI Processing Function
+def process_deconstruction(file_obj, lang):
+    api_key = os.getenv("GEMINI_API_KEY", "")
+    if not api_key:
+        return "⚠️ **Error:** `GEMINI_API_KEY` is missing in Streamlit Secrets."
+    
+    try:
+        import google.generativeai as genai
+        genai.configure(api_key=api_key)
+        
+        img = Image.open(file_obj)
+        prompt = f"""
+        You are ZINO Vision Engine using Feynman Methodology.
+        Analyze and deconstruct this engineering or mathematical textbook image.
+        Target Output Language: {lang}
+
+        Please structure your output strictly in Markdown as follows:
+        ---
+        ## 📐 1. Academic & Mathematical Rigor
+        * **Core Formula / Theorem:** State formulas in clear LaTeX format ($E = mc^2$).
+        * **Variable Definitions:** Symbols and their physical units.
+        * **Engineering Context:** Step-by-step application breakdown.
+
+        ---
+        ## 💡 2. Feynman Intuitive Analogy
+        * **The Analogy:** Simple everyday story explaining the concept clearly.
+        * **Golden Rule:** One core takeaway sentence.
+        ---
+        """
+        
+        # قائمة النماذج الفعالة
+        models = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.5-flash"]
+        last_error = ""
+
+        for m in models:
+            try:
+                model = genai.GenerativeModel(m)
+                res = model.generate_content([prompt, img])
+                if res and res.text:
+                    return res.text
+            except Exception as e:
+                last_error = str(e)
+                continue
+                
+        return f"⚠️ Exception: {last_error}"
+    except Exception as e:
+        return f"⚠️ Processing Exception: {str(e)}"
+
+# 6. Execution Trigger
 if uploaded_file is not None:
     st.image(uploaded_file.getvalue(), caption="Target Page Preview", use_container_width=True)
     
     if st.button("Deconstruct & Analyze Page 🚀"):
         with st.spinner("Processing page layout and running Feynman vision engine..."):
-            result = ai_engine.deconstruct_engineering_page(uploaded_file, language=selected_language)
+            result = process_deconstruction(uploaded_file, selected_language)
             st.success("Deconstruction Complete!")
             st.markdown(result)
 
-# 6. Footer
+# 7. Footer
 st.markdown("""
 <div class="custom-footer">
     <b>ZINO AI Systems</b> © 2026 — Developed & Maintained by <b>Ismail Hasasnah</b>

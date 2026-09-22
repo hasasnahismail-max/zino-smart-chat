@@ -13,20 +13,8 @@ def deconstruct_engineering_page(image_file) -> str:
     rigorous LaTeX math and intuitive Feynman-style analogies.
     """
     try:
-        # Dynamic model selection with fallback mechanism
-        available_models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-pro"]
-        model = None
-        
-        for model_name in available_models:
-            try:
-                model = genai.GenerativeModel(model_name)
-                break
-            except Exception:
-                continue
-
-        if not model:
-            # Fallback default
-            model = genai.GenerativeModel("gemini-2.5-flash")
+        # Use gemini-3.6-flash as required by API
+        model = genai.GenerativeModel("gemini-3.6-flash")
 
         img = Image.open(image_file)
 

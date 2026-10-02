@@ -29,7 +29,6 @@ An AI-Powered Responsive Messaging, NLP Diagnostic, and **Feynman-Style STEM Sim
 
 ---
 
-## 👨‍💻 Author & License
+## 👨‍💻 Author 
 
-* **Developer:** Ismail Hasasnah
-* **License:** MIT License
+* **Developer:** Ismail Hasasna 

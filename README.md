@@ -1,34 +1,44 @@
-# ZINO Smart Messenger & Feynman STEM Engine 💬📐
+# 🧠 ZINO Smart Messenger Feynman STEM Engine
 
-An AI-Powered Responsive Messaging, NLP Diagnostic, and **Feynman-Style STEM Simplifier Platform** Engineered & Founded by Ismail Hasasnah.
+![Python](https://img.shields.io/badge/Language-Python%203.10-blue.svg)
+![NLP](https://img.shields.io/badge/Domain-NLP%20%26%20STEM-orange.svg)
+![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)
 
----
-
-## 📌 Executive Overview
-
-**ZINO Smart Messenger** is an intelligent messaging and learning simulation platform. Beyond real-time Natural Language Processing (NLP) and speech analytics, it features a specialized **Feynman STEM Summarization Module** designed to break down, simplify, and explain complex mathematical theorems, formulas, and physics concepts into clear, intuitive mental models.
+> An intelligent educational NLP framework that implements the Feynman Learning Technique to break down complex mathematical and physics concepts into intuitive, step-by-step explanations.
 
 ---
 
-## 🚀 Key Technical Features
+## 📸 Quick Visual Demo
 
-* **Feynman STEM Summarization Engine:** Simplifies high-level Physics theories, Calculus, Linear Algebra, and Engineering concepts using Feynman's core learning principles.
-* **Smart Chat Summarization:** High-speed dialogue condensation and key insight extraction powered by LLMs.
-* **Voice-to-Action Analytics & Speech Processing:** Converts audio input into structured actions and analytical insights.
-* **Contextual Multi-Lingual Engine:** Native auto-reply supporting **Arabic, English, and Russian**.
-* **Sentiment Analysis & Security Guard:** Monitors conversation tone and ensures query integrity.
+![Feynman Engine Demo](./assets/demo_preview.gif)
+
+🎬 **[Watch Interactive Demo Video](https://github.com/IsmailHasasna)**
 
 ---
 
-## 🛠 Tech Stack
+## 🔑 Core Features & Engineering Highlights
 
-* **Language:** Python 3.10+
-* **Frontend:** Streamlit
-* **Core AI Engine:** Google Gemini API
-* **Data Processing:** Pandas, Pillow, Math/LaTeX Rendering
+- **Algorithmic Simplification:** Uses NLP parsing and symbolic math modules to decompose advanced formulas into fundamental intuitive layers.
+- **Natural Language Parsing:** Structured query handling and regex processing for interactive user input.
+- **Modular STEM Framework:** Extensible domain logic supporting physics equations, linear algebra, and calculus principles.
+- **Real-time Interaction:** Fast execution interface providing instant concept verification and modular feedback.
 
 ---
 
-## 👨‍💻 Author 
+## 🛠️ Tech Stack & Requirements
 
-* **Developer:** Ismail Hasasna 
+- **Language:** Python 3.10
+- **NLP & Math Libraries:** SymPy, NLTK, Regular Expressions
+- **Environment:** Cross-platform Python Runtime
+
+---
+
+## 🚀 Quick Execution Guide
+
+```bash
+# Clone repository
+git clone https://github.com/IsmailHasasna/ZINO-Feynman-STEM-Engine.git
+cd ZINO-Feynman-STEM-Engine
+
+# Run engine
+python main_engine.py

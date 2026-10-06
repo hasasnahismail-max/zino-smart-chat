@@ -7,71 +7,79 @@ from PIL import Image
 
 def process_stem_analysis(image_file, target_language="Arabic") -> str:
     """
-    محرك ZINO Vision Engine للتحليل الأكاديمي الهندسي وتفكيك فاينمان.
-    يعتمد نموذج gemini-3.8-flash المعتمد رسمياً من جوجل مع معالجة ضغط السيرفر (503).
+    محرك ZINO Vision Engine للتحليل الأكاديمي وتفكيك المفاهيم بأسلوب فاينمان (Feynman Technique).
+    مربوط بأحدث إصدار من مكتبة Google GenAI ومصمم لتفادي أخطاء الضغط (503) والنماذج المفقودة (404).
     """
     try:
-        # 1. جلب مفتاح API
+        # 1. التحقق من وجود مفتاح الـ API
         api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
         
         if not api_key:
-            return "⚠️ **تنبيه:** لم يتم العثور على مفتاح API (`GEMINI_API_KEY`). يرجى إضافته في Streamlit Secrets."
+            return "⚠️ **تنبيه:** لم يتم العثور على مفتاح API (`GEMINI_API_KEY`). يرجى التأكد من إضافته في Streamlit Secrets."
 
-        # 2. إنشاء عميل الذكاء الاصطناعي
+        # 2. إنشاء عميل SDK الخاص بـ Google GenAI
         client = genai.Client(api_key=api_key)
 
-        # 3. قراءة وتجهيز الصورة
+        # 3. تجهيز وتحويل الصورة إلى نظام RGB
         image = Image.open(image_file).convert("RGB")
 
-        # 4. توجيهات النظام (الدقة الأكاديمية + أسلوب فاينمان)
+        # 4. توجيهات النظام الصارمة (تفكيك أكاديمي دقيق + أسلوب فاينمان التفاعلي)
         system_instruction = """
         أنت محرك ZINO Vision Engine المتخصص في التفكيك الأكاديمي الهندسي الصارم وتبسيط المفاهيم بأسلوب فاينمان (Feynman Technique).
 
         قم بتحليل الشريحة المرفقة بدقة وتنظيم الإجابة لتشمل قسمين أساسيين:
 
         📍 **القسم الأول: التحليل الأكاديمي والدراسة العلمية الرسمية**
-        1. قراءة النصوص والمعادلات المكتوبة بالصورة فقط (OCR دقيق).
-        2. استخراج القوانين والرموز والوحدات الفيزيائية والهندسية.
-        3. تنسيق كافة معادلات LaTeX:
-           - المعادلات المستقلة بين $$...$$
-           - الرموز المدمجة بالنص بين $...$
+        1. قراءة كافة النصوص والمعادلات المكتوبة بالصورة بدقة (OCR دقيق).
+        2. استخراج القوانين، الرموز، والوحدات الفيزيائية والهندسية المذكورة فقط.
+        3. تنسيق كافة معادلات ورموز LaTeX بعناية:
+           - المعادلات المستقلة في أسطر منفصلة ضعها بين $$...$$
+           - الرموز والمتغيرات المدمجة داخل النص ضعها بين $...$
 
         📍 **القسم الثاني: تشبيه فاينمان السلس والتفاعلي (Feynman Intuition)**
-        1. اشرح المفهوم الهندسي بلغة بسيطة جداً وكأنك تشرح لشخص غير متخصص.
-        2. استخدم تشبيهات وأمثلة ملموسة من الحياة اليومية (مثل تشبيه المادة بنوابض ميكروسكوبية، معامل يونغ E بصلابة حبل الغسيل، التخصر Necking بسحب قطعة علكة).
-        3. فكك القانون الرياضي إلى معناه الفيزيائي الملموس (دور القوة P، الطول L، المساحة A، ومعامل المرونة E).
+        1. اشرح المفهوم الهندسي/الفيزيائي الرئيسي بلغة بسيطة جداً وكأنك تشرح لشخص ليس لديه خلفية هندسية.
+        2. استخدم تشبيهات وأمثلة ملموسة من الحياة اليومية (مثل: تشبيه المادة بنوابض ميكروسكوبية، تشبيه معامل يونغ E بصلابة حبل الغسيل، أو تشبيه التخصر Necking بسحب قطعة علكة أو معجون حتى تنقطع).
+        3. فكك القانون الرياضي إلى معناه الفيزيائي الملموس:
+           - ماذا تفعل القوة P؟
+           - ما دور الطول L؟
+           - ما دور المساحة A ومعامل المرونة E في المقاومة؟
+        4. ركز على بناء الإدراك الفيزيائي والميكانيكي الحقيقي.
 
-        🔴 **قاعدة منع الهلوسة:** لا تضف أي بيانات غير موجودة بالصورة المرفقة.
+        🔴 **قاعدة منع الهلوسة الصارمة:** لا تخترع أو تضف أي بيانات أو أرقام غير موجودة في الصورة المرفقة.
         """
 
-        prompt = f"قم بقراءة وتحليل هذه الشريحة الأكاديمية بالكامل بلغة: {target_language}. اربط الشرح الأكاديمي بقسم فاينمان المبسط."
+        prompt = f"قم بقراءة وتحليل هذه الشريحة الأكاديمية بالكامل بلغة: {target_language}. اربط الشرح الأكاديمي الدقيق بقسم فاينمان المبسط."
 
-        # 5. النموذج المعتمد رسمياً لدى جوجل
-        model_name = 'gemini-3.8-flash'
+        # 5. قائمة النماذج القياسية المستقرة من جوجل
+        # استخدام gemini-2.5-flash كنموذج رئيسي ثابت وسريع لتجنب الـ 503 والـ 404
+        models_to_try = ['gemini-2.5-flash', 'gemini-2.5-pro']
         
-        max_retries = 3
-        for attempt in range(max_retries):
-            try:
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=[prompt, image],
-                    config=types.GenerateContentConfig(
-                        system_instruction=system_instruction,
-                        temperature=0.2
+        last_error = ""
+
+        for model_name in models_to_try:
+            for attempt in range(2): # محاولتان سريعتان لكل نموذج
+                try:
+                    response = client.models.generate_content(
+                        model=model_name,
+                        contents=[prompt, image],
+                        config=types.GenerateContentConfig(
+                            system_instruction=system_instruction,
+                            temperature=0.2
+                        )
                     )
-                )
-                if response and response.text:
-                    return response.text
-            except Exception as e:
-                error_msg = str(e)
-                # في حال وجود ضغط سيرفر مؤقت (503)، ننتظر ثانيتين ونكرر الطلب
-                if "503" in error_msg or "UNAVAILABLE" in error_msg:
-                    if attempt < max_retries - 1:
+                    if response and response.text:
+                        return response.text
+
+                except Exception as e:
+                    last_error = str(e)
+                    # إذا كان الخطأ بسبب ضغط مؤقت (503)، ننتظر ثانيتين ونحاول مجدداً
+                    if "503" in last_error or "UNAVAILABLE" in last_error:
                         time.sleep(2)
                         continue
-                return f"⚠️ **خطأ في الاتصال بالنموذج `{model_name}`:**\n`{error_msg}`"
+                    # إذا كان الخطأ غير ذلك، ننتقل فوراً للنموذج التالي في القائمة
+                    break
 
-        return "⚠️ **خوادم جوجل تعاني من ضغط مؤقت (503). يرجى إعادة الضغط على الزر بعد بضع ثوانٍ.**"
+        return f"⚠️ **تعذر الاتصال بمركز معالجة Google حالياً.**\n\n**تفاصيل الخطأ:** `{last_error}`\n\n💡 **يرجى إعادة الضغط على الزر مرة أخرى.**"
 
     except Exception as general_error:
-        return f"❌ **حدث خطأ غير متوقع:** `{str(general_error)}`"
+        return f"❌ **حدث خطأ غير متوقع أثناء المعالجة:** `{str(general_error)}`"

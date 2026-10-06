@@ -5,11 +5,10 @@ from PIL import Image
 
 def process_stem_analysis(image_file, target_language="Arabic") -> str:
     """
-    محرك ZINO Vision Engine المعالج لقراءة بكسلات الصورة الحقيقية 
-    باستخدام الحزمة المستقرة google-generativeai
+    محرك ZINO Vision Engine للتحليل الأكاديمي والهندسي
     """
     try:
-        # 1. جلب مفتاح API من Streamlit Secrets أو متغيرات البيئة
+        # 1. التحقق من وجود مفتاح API
         api_key = None
         if "GEMINI_API_KEY" in st.secrets:
             api_key = st.secrets["GEMINI_API_KEY"]
@@ -19,13 +18,13 @@ def process_stem_analysis(image_file, target_language="Arabic") -> str:
         if not api_key:
             return "⚠️ **تنبيه:** لم يتم العثور على مفتاح API (`GEMINI_API_KEY`). يرجى إضافته في Streamlit Secrets."
 
-        # 2. تهيئة العميل بمفتاح API
+        # 2. تهيئة مكتبة Gemini
         genai.configure(api_key=api_key)
 
-        # 3. فتح الصورة المرفوعة
+        # 3. قراءة الصورة
         image = Image.open(image_file)
 
-        # 4. التوجيهات الصارمة لقراءة محتوى الصورة الفعلي دون هلوسة
+        # 4. التعليمات الأكاديمية الصارمة (System Prompt)
         system_instruction = """
         أنت محرك ZINO Vision Engine للتحليل الأكاديمي الهندسي الصارم.
         مهمتك الأساسية هي إجراء مسح بصري دقيق (OCR) وقراءة المحتوى المكتوب في الصورة المرفقة فقط!
@@ -49,9 +48,9 @@ def process_stem_analysis(image_file, target_language="Arabic") -> str:
            10. خطة المراجعة والتثبيت (Review Roadmap)
         """
 
-        # 5. إنشاء النموذج باستعمال gemini-1.5-flash المخصص للرؤية والسريع
+        # 5. استخدام اسم النموذج الحديث المدعوم: gemini-2.5-flash
         model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
+            model_name="gemini-2.5-flash",
             system_instruction=system_instruction
         )
 
@@ -60,7 +59,7 @@ def process_stem_analysis(image_file, target_language="Arabic") -> str:
         استخرج القوانين الحقيقية المكتوبة بالصورة فقط وقم بتفكيكها عبر الأقسام الـ 10 كاملة دون حذف.
         """
 
-        # 6. إرسال النص والصورة معاً
+        # 6. توليد الإجابة
         response = model.generate_content([prompt, image])
         
         return response.text

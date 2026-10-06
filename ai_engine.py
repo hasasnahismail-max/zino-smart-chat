@@ -1,4 +1,5 @@
 import os
+import time
 import streamlit as st
 from google import genai
 from google.genai import types
@@ -7,22 +8,22 @@ from PIL import Image
 def process_stem_analysis(image_file, target_language="Arabic") -> str:
     """
     محرك ZINO Vision Engine للتحليل الأكاديمي الهندسي وتفكيك فاينمان.
-    محدث ومزود بنظام إظهار أسباب الأخطاء بوضوح لتفادي التعليق.
+    يعتمد نموذج gemini-3.8-flash المعتمد رسمياً من جوجل مع معالجة ضغط السيرفر (503).
     """
     try:
         # 1. جلب مفتاح API
         api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
         
         if not api_key:
-            return "⚠️ **تنبيه:** لم يتم العثور على مفتاح API (`GEMINI_API_KEY`). يرجى التأكد من إضافته في Streamlit Secrets."
+            return "⚠️ **تنبيه:** لم يتم العثور على مفتاح API (`GEMINI_API_KEY`). يرجى إضافته في Streamlit Secrets."
 
         # 2. إنشاء عميل الذكاء الاصطناعي
         client = genai.Client(api_key=api_key)
 
-        # 3. معالجة وقراءة الصورة
+        # 3. قراءة وتجهيز الصورة
         image = Image.open(image_file).convert("RGB")
 
-        # 4. توجيهات النظام الصارمة (الأكاديمية + أسلوب فاينمان)
+        # 4. توجيهات النظام (الدقة الأكاديمية + أسلوب فاينمان)
         system_instruction = """
         أنت محرك ZINO Vision Engine المتخصص في التفكيك الأكاديمي الهندسي الصارم وتبسيط المفاهيم بأسلوب فاينمان (Feynman Technique).
 
@@ -45,11 +46,11 @@ def process_stem_analysis(image_file, target_language="Arabic") -> str:
 
         prompt = f"قم بقراءة وتحليل هذه الشريحة الأكاديمية بالكامل بلغة: {target_language}. اربط الشرح الأكاديمي بقسم فاينمان المبسط."
 
-        # 5. النماذج الرسمية الثابتة والمعتمدة لدى جوجل
-        models_to_try = ['gemini-2.0-flash', 'gemini-1.5-flash']
-        errors_log = []
-
-        for model_name in models_to_try:
+        # 5. النموذج المعتمد رسمياً لدى جوجل
+        model_name = 'gemini-3.8-flash'
+        
+        max_retries = 3
+        for attempt in range(max_retries):
             try:
                 response = client.models.generate_content(
                     model=model_name,
@@ -61,12 +62,16 @@ def process_stem_analysis(image_file, target_language="Arabic") -> str:
                 )
                 if response and response.text:
                     return response.text
-            except Exception as err:
-                errors_log.append(f"• Model `{model_name}`: {str(err)}")
+            except Exception as e:
+                error_msg = str(e)
+                # في حال وجود ضغط سيرفر مؤقت (503)، ننتظر ثانيتين ونكرر الطلب
+                if "503" in error_msg or "UNAVAILABLE" in error_msg:
+                    if attempt < max_retries - 1:
+                        time.sleep(2)
+                        continue
+                return f"⚠️ **خطأ في الاتصال بالنموذج `{model_name}`:**\n`{error_msg}`"
 
-        # إظهار أسباب الفشل بالتفصيل بدلاً من العبارات المبهمة
-        detailed_errors = "\n".join(errors_log)
-        return f"⚠️ **فشل الاتصال بالنماذج. تفاصيل التشخيص:**\n\n{detailed_errors}"
+        return "⚠️ **خوادم جوجل تعاني من ضغط مؤقت (503). يرجى إعادة الضغط على الزر بعد بضع ثوانٍ.**"
 
     except Exception as general_error:
-        return f"❌ **حدث خطأ عام:** `{str(general_error)}`"
+        return f"❌ **حدث خطأ غير متوقع:** `{str(general_error)}`"

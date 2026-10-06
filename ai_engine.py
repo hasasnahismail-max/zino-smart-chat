@@ -6,23 +6,23 @@ from PIL import Image
 
 def process_stem_analysis(image_file, target_language="Arabic") -> str:
     """
-    محرك ZINO Vision Engine المطور للسرعة الفائقة والتحليل بأسلوب فاينمان.
-    تم الاستغناء عن حلقات الانتظار الطويلة لتفادي تعليق الشاشة.
+    محرك ZINO Vision Engine للتحليل الأكاديمي الهندسي وتفكيك فاينمان.
+    محدث ومزود بنظام إظهار أسباب الأخطاء بوضوح لتفادي التعليق.
     """
     try:
         # 1. جلب مفتاح API
         api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
         
         if not api_key:
-            return "⚠️ **تنبيه:** لم يتم العثور على مفتاح API (`GEMINI_API_KEY`). يرجى إضافته في Streamlit Secrets."
+            return "⚠️ **تنبيه:** لم يتم العثور على مفتاح API (`GEMINI_API_KEY`). يرجى التأكد من إضافته في Streamlit Secrets."
 
         # 2. إنشاء عميل الذكاء الاصطناعي
         client = genai.Client(api_key=api_key)
 
-        # 3. معالجة وتجهيز الصورة
+        # 3. معالجة وقراءة الصورة
         image = Image.open(image_file).convert("RGB")
 
-        # 4. توجيهات النظام (الدقة الأكاديمية + أسلوب فاينمان)
+        # 4. توجيهات النظام الصارمة (الأكاديمية + أسلوب فاينمان)
         system_instruction = """
         أنت محرك ZINO Vision Engine المتخصص في التفكيك الأكاديمي الهندسي الصارم وتبسيط المفاهيم بأسلوب فاينمان (Feynman Technique).
 
@@ -30,7 +30,7 @@ def process_stem_analysis(image_file, target_language="Arabic") -> str:
 
         📍 **القسم الأول: التحليل الأكاديمي والدراسة العلمية الرسمية**
         1. قراءة النصوص والمعادلات المكتوبة بالصورة فقط (OCR دقيق).
-        2. استخراج القوانين والرموز والوحدات الفيزيائية.
+        2. استخراج القوانين والرموز والوحدات الفيزيائية والهندسية.
         3. تنسيق كافة معادلات LaTeX:
            - المعادلات المستقلة بين $$...$$
            - الرموز المدمجة بالنص بين $...$
@@ -45,9 +45,10 @@ def process_stem_analysis(image_file, target_language="Arabic") -> str:
 
         prompt = f"قم بقراءة وتحليل هذه الشريحة الأكاديمية بالكامل بلغة: {target_language}. اربط الشرح الأكاديمي بقسم فاينمان المبسط."
 
-        # 5. طلب أسرع نموذج مباشر دون انتظار
-        models_to_try = ['gemini-2.5-flash', 'gemini-1.5-flash']
-        
+        # 5. النماذج الرسمية الثابتة والمعتمدة لدى جوجل
+        models_to_try = ['gemini-2.0-flash', 'gemini-1.5-flash']
+        errors_log = []
+
         for model_name in models_to_try:
             try:
                 response = client.models.generate_content(
@@ -60,10 +61,12 @@ def process_stem_analysis(image_file, target_language="Arabic") -> str:
                 )
                 if response and response.text:
                     return response.text
-            except Exception:
-                continue # الانتقال الفوري للنموذج التالي بدون وقت انتظار time.sleep
+            except Exception as err:
+                errors_log.append(f"• Model `{model_name}`: {str(err)}")
 
-        return "⚠️ **تعذر الاتصال بالمحرك في هذه اللحظة، يرجى إعادة الضغط على الزر مرة أخرى.**"
+        # إظهار أسباب الفشل بالتفصيل بدلاً من العبارات المبهمة
+        detailed_errors = "\n".join(errors_log)
+        return f"⚠️ **فشل الاتصال بالنماذج. تفاصيل التشخيص:**\n\n{detailed_errors}"
 
     except Exception as general_error:
-        return f"❌ **حدث خطأ غير متوقع:** `{str(general_error)}`"
+        return f"❌ **حدث خطأ عام:** `{str(general_error)}`"

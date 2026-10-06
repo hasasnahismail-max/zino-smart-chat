@@ -1,4 +1,5 @@
 import os
+import time
 import streamlit as st
 from google import genai
 from google.genai import types
@@ -7,10 +8,10 @@ from PIL import Image
 def process_stem_analysis(image_file, target_language="Arabic") -> str:
     """
     محرك ZINO Vision Engine للتحليل الأكاديمي والهندسي المتقدم.
-    يتضمن نظام التبديل التلقائي بين النماذج لتفادي انقطاع الخدمة عند الضغط العالي على الخوادم.
+    يعتمد نموذج gemini-3.8-flash المعتمد رسمياً مع نظام إعادة المحاولة عند الضغط.
     """
     try:
-        # 1. جلب مفتاح API بأمان من Secrets أو متغيرة البيئة
+        # 1. جلب مفتاح API بأمان
         api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
         
         if not api_key:
@@ -19,10 +20,10 @@ def process_stem_analysis(image_file, target_language="Arabic") -> str:
         # 2. إنشاء عميل الذكاء الاصطناعي
         client = genai.Client(api_key=api_key)
 
-        # 3. قراءة وتجهيز الصورة وتعديل نمط الألوان إلى RGB بأمان
+        # 3. قراءة وتجهيز الصورة
         image = Image.open(image_file).convert("RGB")
 
-        # 4. إعداد التوجيهات النظامية والبرومبت الأكاديمي
+        # 4. التوجيه الأكاديمي
         system_instruction = """
         أنت محرك ZINO Vision Engine للتحليل الأكاديمي والهندسي الصارم.
         مهمتك الأساسية هي قراءة واستخراج المحتوى البصري والأكاديمي من الشريحة/الصورة المرفقة بدقة متناهية (OCR دقيق).
@@ -41,18 +42,12 @@ def process_stem_analysis(image_file, target_language="Arabic") -> str:
         استخرج النص والقوانين والمفاهيم بدقة واشرحها تفصيلياً عبر التنسيق الأكاديمي الشامل.
         """
 
-        # 5. قائمة النماذج المعتمدة بالترتيب حسب الأحدث والأسرع
-        models_to_try = [
-            'gemini-2.5-flash',
-            'gemini-2.0-flash',
-            'gemini-1.5-flash',
-            'gemini-1.5-pro'
-        ]
-
+        # 5. استخدام النموذج المعتمد حصراً مع إعادة المحاولة في حال وجود ضغط (Retry Logic)
+        model_name = 'gemini-3.8-flash'
+        max_retries = 3
         last_error = None
 
-        # 6. المحاولة التلقائية عبر النماذج بالتتابع
-        for model_name in models_to_try:
+        for attempt in range(max_retries):
             try:
                 response = client.models.generate_content(
                     model=model_name,
@@ -68,15 +63,10 @@ def process_stem_analysis(image_file, target_language="Arabic") -> str:
                     
             except Exception as e:
                 last_error = e
-                # الانتقال التجريبي للنموذج التالي فوراً
-                continue
+                # الانتظار لمدة ثانيتين قبل إعادة المحاولة تلقائياً في حال وجود ضغط 503
+                time.sleep(2)
 
-        # في حال استنفاد كافة النماذج مع وجود خطأ في الاتصال
-        return (
-            "⚠️ **تنبيه:** تعذر الاتصال بخوادم Google حالياً بسبب الضغط المؤقت على الخدمة.\n\n"
-            f"**تفاصيل الخطأ:** `{str(last_error)}`\n\n"
-            "💡 **حل مقترح:** يرجى إعادة الضغط على زر التفكيك بعد بضع ثوانٍ."
-        )
+        return f"⚠️ **السيرفر مشغول حالياً، يرجى الضغط مرة أخرى بعد ثوانٍ قليلة.**\nتفاصيل: `{str(last_error)}`"
 
     except Exception as general_error:
         return f"❌ **حدث خطأ غير متوقع أثناء المعالجة:** `{str(general_error)}`"

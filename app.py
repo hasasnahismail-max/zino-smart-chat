@@ -61,13 +61,13 @@ I18N = {
         "analyze_btn": "🚀 Начать анализ по 10 разделам",
         "spinner": "Анализ и проверка уравнений по 12 правилам...",
         "results_header": "📊 Результаты академического анализа:",
-        "footer": "ZINO AI Systems © 2026 — Исмаил Хасасна",
+        "footer": "Загруженное изображение",
         "uploaded_caption": "Загруженное изображение",
         "dir": "ltr"
     }
 }
 
-# 3. حفظ خيار اللغة في الجلسة
+# 3. اختيار اللغة
 if "target_lang" not in st.session_state:
     st.session_state["target_lang"] = "Arabic"
 
@@ -87,7 +87,7 @@ selected_lang = st.selectbox(
 st.session_state["target_lang"] = selected_lang
 txt = I18N[selected_lang]
 
-# 4. التنسيق البرمجي (CSS)
+# 4. التنسيق البرمجي (CSS) المطور لإصلاح معادلات LaTeX
 st.markdown(f"""
     <style>
     .stApp {{
@@ -113,6 +113,17 @@ st.markdown(f"""
     .pill-lang {{ background: rgba(0, 212, 255, 0.2); border: 2px solid #00D4FF; color: #E0F7FA !important; }}
     .pill-stem {{ background: rgba(255, 42, 133, 0.2); border: 2px solid #FF2A85; color: #FF80AB !important; }}
     
+    /* إصلاح محاذاة الرياضيات ومنع تشوه المعادلة */
+    .katex-display {{
+        direction: ltr !important;
+        text-align: center !important;
+        padding: 10px 0;
+    }}
+    .katex {{
+        direction: ltr !important;
+        unicode-bidi: isolate !important;
+    }}
+
     div[data-baseweb="select"] > div {{ background-color: #2D0B16 !important; border: 2px solid #00D4FF !important; }}
     div[data-baseweb="select"] * {{ color: #FFFFFF !important; font-weight: 700 !important; }}
     
@@ -140,13 +151,13 @@ st.markdown(f'''
 
 st.markdown(f'<div style="text-align:center; background:rgba(255,255,255,0.08); padding:12px; border-radius:10px; margin-bottom:20px;">{txt["description"]}</div>', unsafe_allow_html=True)
 
-# 6. قسم رفع وتحليل الصور
+# 6. رفع الصور والتحليل
 st.markdown(f'### {txt["upload_label"]}')
 uploaded_file = st.file_uploader("", type=["jpg", "png", "jpeg"], help=txt["upload_help"])
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    st.image(image, caption=txt["uploaded_caption"], use_column_width=True)
+    st.image(image, caption=txt["uploaded_caption"], use_container_width=True)
     
     if st.button(txt["analyze_btn"]):
         with st.spinner(txt["spinner"]):
@@ -154,7 +165,7 @@ if uploaded_file is not None:
                 from ai_engine import process_stem_analysis
                 analysis_result = process_stem_analysis(uploaded_file, selected_lang)
             except Exception as e:
-                analysis_result = f"Error: {str(e)}"
+                analysis_result = f"⚠️️ خطأ في تشغيل المحرك: {str(e)}"
             
             st.markdown("---")
             st.markdown(f'### {txt["results_header"]}')

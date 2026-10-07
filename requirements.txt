@@ -1,6 +1,5 @@
 streamlit
-google-generativeai
-google-genai
-pillow
+fastapi
+uvicorn
+opencv-python-headless
 numpy
-sympy

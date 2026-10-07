@@ -46,7 +46,7 @@ def process_stem_analysis(image_file, target_language="Arabic") -> str:
 
         prompt = f"قم بقراءة وتحليل هذه الشريحة الأكاديمية بالكامل بلغة: {target_language}. اربط الشرح الأكاديمي بقسم فاينمان المبسط."
 
-        # 5. استخدام اسم النموذج المعتمد رسمياً في الرسالة (gemini-3.1-pro-preview)
+        # 5. استخدام اسم النموذج المعتمد رسمياً من سيرفرات جوجل (gemini-3.1-pro-preview)
         model_name = 'gemini-3.1-pro-preview'
         
         max_retries = 3

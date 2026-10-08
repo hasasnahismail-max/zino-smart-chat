@@ -31,7 +31,7 @@ I18N = {
     },
     "English": {
         "title": "ZINO Vision Engine 🪶",
-        "badge": "⚡ Designed & Engineered by Ismail Hasasnah",
+        "badge": "⚡ Designed & Engineered by Ismail Hasasna",
         "pill_math": "🧮 10 Strict Academic Sections",
         "pill_feynman": "📜 12 Rules of Verification",
         "pill_lang": "🌐 Multi-Language (EN / AR / RU)",
